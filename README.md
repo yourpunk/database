@@ -54,7 +54,7 @@ false = is_satisfied_for_any(...)   23ms
 ```
 ---
 
-# 🧩 File Structure
+## 🧩 File Structure
 
 |File|	Description|
 |----|-------|
@@ -66,7 +66,7 @@ false = is_satisfied_for_any(...)   23ms
 
 ---
 
-# ⚙️ How to Run
+## ⚙️ How to Run
 
 ```bash
 g++ -std=c++17 -fopenmp main.cpp generator.cpp -o query_eval
@@ -76,7 +76,7 @@ OMP_CANCELLATION=true ./query_eval
 
 ---
 
-# ✍️ My Role
+## ✍️ My Role
 
 - Designed and implemented all logic inside query.h
 - Refactored original "framework" code for modularity and clean benchmarking
@@ -84,7 +84,7 @@ OMP_CANCELLATION=true ./query_eval
 
 ---
 
-# 💬 What I Learned
+## 💬 What I Learned
 
 > Writing efficient query logic is about when to stop, not just how to start.
 This project taught me how to:
@@ -94,13 +94,13 @@ This project taught me how to:
 
 ---
 
-# 📜 License
+## 📜 License
 
 **MIT**. Use it, fork it, break it. Just don’t ship it without understanding it.
 
 ---
 
-# 👤 Author
+## 👤 Author
 
 🦾 Crafted by Aleksandra Kenig (aka [yourpunk](https://github.com/yourpunk)).
 ### 💌 Feedback? Ideas? Collab offers? I’m all ears.
