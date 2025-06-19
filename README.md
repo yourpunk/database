@@ -1,70 +1,106 @@
-# 🧠 Parallel Query Evaluator
+# 🧠 Parallel Predicate Query Evaluator
 
-This project benchmarks the evaluation of logical queries (AND / OR) over simulated data using parallelism.  
-It's built like a minimal fake database engine — just enough logic to stress-test your brain and your CPU.
+A high-performance system for evaluating compound logical predicates (`AND` / `OR`) over large simulated datasets — with a focus on **parallelism**, **early cancellation**, and **query planning logic**.
 
-> ✍️ I wrote `query.h` myself — it contains the logic for evaluating `is_satisfied_for_all` and `is_satisfied_for_any`  
-> The rest is just framework code from school. I made it work.
+Think: *"What if a baby database could still think smart and run fast?"*
 
-## 💡 What it actually does
+---
 
-There are two types of queries:
+## 🔍 What This Is
 
-- `is_satisfied_for_all(predicates, table)`  
-  → True if every predicate matches **at least one** row
+This project simulates a predicate evaluation engine (like `WHERE` clauses in SQL), comparing:
 
-- `is_satisfied_for_any(predicates, table)`  
-  → True if **any** predicate matches at least one row
+- ✅ `is_satisfied_for_all(predicates, table)`
+- ✅ `is_satisfied_for_any(predicates, table)`
 
-Each predicate simulates a slow check (e.g., disk access) using an artificial 2-microsecond delay.
+Each predicate is artificially slowed down (2μs delay) to simulate I/O latency, testing how well the system performs **under pressure**.
 
-The whole thing runs in parallel with OpenMP to see how fast we can crunch large queries.
+Built-in **OpenMP parallelism** is used to:
+- Execute independent checks across rows
+- Cancel early if a result is known (`OMP_CANCELLATION` required)
 
+---
 
-## 🧪 Tests included
+## 🧠 Why It Matters
 
-| Test Case                            | Description                                |
-|-------------------------------------|--------------------------------------------|
-| `TestAll<true>`                     | All predicates must be satisfied           |
-| `TestAny<true>`                     | At least one predicate must be satisfied   |
-| `TestAll<false>`, `TestAny<false>` | Negative tests to catch false positives    |
+Most naive query evaluators brute-force checks across all data.  
+This project demonstrates:
 
-Output example:
+- ⚙️ Smart use of **OpenMP parallelism** with cancellation
+- 🧩 Clean **predicate logic abstraction** (`std::function`-style)
+- 🔎 Simulated stress-testing through synthetic I/O latency
+- ✅ Reproducible benchmarking & logic verification
+
+> 🔥 Designed to **think like a database**, not just loop like a script
+
+---
+
+## 🧪 Test Cases
+
+| Test Name         | Purpose                            |
+|-------------------|-------------------------------------|
+| `TestAll<true>`   | Validates complete `AND` pass       |
+| `TestAny<true>`   | Validates partial `OR` pass         |
+| `TestAll<false>`  | Ensures `AND` short-circuits safely |
+| `TestAny<false>`  | Ensures `OR` doesn't false-positive |
+
+Example output:
+
 ```yaml
-true = is_satisfied_for_all(...) 132ms
-true = is_satisfied_for_any(...) 58ms
-
-false = is_satisfied_for_all(...) --- wrong result ---
-false = is_satisfied_for_any(...) 23ms
+true = is_satisfied_for_all(...)   132ms
+true = is_satisfied_for_any(...)    58ms
+false = is_satisfied_for_all(...)   --- wrong result ---
+false = is_satisfied_for_any(...)   23ms
 ```
+---
 
-## 🔧 How to run it
+# 🧩 File Structure
+
+|File|	Description|
+|----|-------|
+|`query.h` |	⭐ My core logic: predicate composition & evaluation engine|
+|`generator.*` |	Synthetic data & predicate creation|
+|`tests.h` |	Wraps logic into repeatable test harnesses|
+|`main.cpp`	| Runs test matrix, logs times, verifies output|
+|`params.h`	| Tweak dataset size, delay time, etc.|
+
+---
+
+# ⚙️ How to Run
 
 ```bash
 g++ -std=c++17 -fopenmp main.cpp generator.cpp -o query_eval
-./query_eval
+OMP_CANCELLATION=true ./query_eval
 ```
-> ⚠️ OpenMP cancellation must be enabled. <br><br>If you see a warning, run with: `OMP_CANCELLATION=true ./query_eval`
+> Requires **OpenMP** with cancellation support.<br>If your compiler warns you, double-check `OMP_CANCELLATION` is set.
 
-## 🧩 File Breakdown
+---
 
-|File |	What it does|
-|-----|-------------|
-|query.h	| ⭐ My work. Core logic for queries.|
-|generator.* |	Generates random data and predicates.|
-|tests.h	| Test wrappers for true/false logic.|
-|main.cpp	| Runs the whole thing and times it.|
-|params.h	| Tweak query length, row count, etc.|
+# ✍️ My Role
 
-## 🧠 Why I care
+- Designed and implemented all logic inside query.h
+- Refactored original "framework" code for modularity and clean benchmarking
+- Introduced OpenMP cancellation to avoid wasteful cycles
 
-Most students just blindly copy logic or write “if/else” spaghetti. I wanted to actually understand what makes a predicate system tick, how to write clean functional logic, and how to test it under pressure.
+---
 
-I also wanted to try cancellation with `OpenMP` — because not everything should be brute-forced till the end.
+# 💬 What I Learned
 
-## 📜 License
-MIT. Copy, fork, break it, improve it — just don’t ship nonsense.
+> Writing efficient query logic is about when to stop, not just how to start.
+This project taught me how to:
+- Think like a query planner
+- Structure parallel logic around short-circuiting
+- Test correctness under multithreaded constraints
 
-## 👤 Author
-🦾 Crafted by Aleksandra Kenig (aka [yourpunk](https://github.com/yourpunk)).<br>
-💌 Wanna collab or throw some feedback? You know where to find me.
+---
+
+# 📜 License
+
+**MIT**. Use it, fork it, break it. Just don’t ship it without understanding it.
+
+---
+
+# 👤 Author
+
+🦾 Crafted by Aleksandra Kenig (aka [yourpunk](https://github.com/yourpunk)).
+### 💌 Feedback? Ideas? Collab offers? I’m all ears.
